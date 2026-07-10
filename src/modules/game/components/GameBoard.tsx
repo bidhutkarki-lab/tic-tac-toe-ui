@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { Game } from "../types/types";
-import { applyGameState, submitMove } from "../api/api";
+import type { Game } from "../types";
+import { applyGameState, submitMove } from "../api";
 import { Board } from "./Board";
 
 type GameBoardProps = {

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import type { Game } from "../types/types";
-import { getGame } from "../api/api";
+import type { Game } from "../types";
+import { getGame } from "../api";
 import { GameBoard } from "../components/GameBoard";
 
 export function GamePage() {

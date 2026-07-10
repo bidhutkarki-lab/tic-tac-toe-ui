@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { SyntheticEvent } from "react";
-import { createGame } from "../api/api";
-import type { Game } from "../types/types";
+import { createGame } from "../api";
+import type { Game } from "../types";
 
 type NewGameFormProps = {
   onCreated: (game: Game) => void;

@@ -1,5 +1,5 @@
-import type { Cell, Game, GameView } from "../types/types";
-import { boardToSquares, calculateWinner } from "../gameLogic/gameLogic";
+import type { Cell, Game, GameView } from "./types";
+import { boardToSquares, calculateWinner } from "./gameLogic";
 
 const API_BASE = "/api/games";
 

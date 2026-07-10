@@ -1,4 +1,4 @@
-import type { Cell, Winner } from "../types/types";
+import type { Cell, Winner } from "./types";
 
 export const LINES = [
   [0, 1, 2],

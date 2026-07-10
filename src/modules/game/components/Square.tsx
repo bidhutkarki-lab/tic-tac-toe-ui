@@ -1,4 +1,4 @@
-import type { Cell } from "../types/types";
+import type { Cell } from "../types";
 
 type SquareProps = {
   value: Cell;
