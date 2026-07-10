@@ -15,3 +15,12 @@ export type Winner = {
   player: Cell;
   line: number[];
 };
+
+// Render-ready view derived from the authoritative server Game.
+export type GameView = {
+  game: Game;
+  squares: Cell[];
+  winner: Winner | null;
+  nextPlayer: Exclude<Cell, null>;
+  isOver: boolean;
+};

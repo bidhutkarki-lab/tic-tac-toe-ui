@@ -1,21 +1,15 @@
-import { useState } from "react";
+import { Routes, Route } from "react-router-dom";
 import "./App.css";
-import type { Game } from "./types";
-import { NewGameForm } from "./components/NewGameForm";
-import { GameBoard } from "./components/GameBoard";
+import { HomePage } from "./pages/HomePage";
+import { GamePage } from "./pages/GamePage";
 
 function App() {
-  const [game, setGame] = useState<Game | null>(null);
-
-  if (!game) {
-    return (
-      <div className="game">
-        <NewGameForm onCreated={setGame} />
-      </div>
-    );
-  }
-
-  return <GameBoard game={game} onNewGame={() => setGame(null)} />;
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/game/:gameId" element={<GamePage />} />
+    </Routes>
+  );
 }
 
 export default App;

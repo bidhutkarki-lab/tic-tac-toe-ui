@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { Cell, Game } from "../types";
-import { calculateWinner, boardToSquares } from "../gameLogic";
+import type { Game } from "../types";
+import { applyGameState, submitMove } from "../api";
 import { Board } from "./Board";
 
 type GameBoardProps = {
@@ -8,32 +8,37 @@ type GameBoardProps = {
   onNewGame: () => void;
 };
 
-export function GameBoard({ game, onNewGame }: GameBoardProps) {
-  const [squares, setSquares] = useState<Cell[]>(() =>
-    boardToSquares(game.board),
-  );
-  const [xIsNext, setXIsNext] = useState(true);
+export function GameBoard({ game: initialGame, onNewGame }: GameBoardProps) {
+  const [game, setGame] = useState(initialGame);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const winner = calculateWinner(squares);
-  const isDraw = !winner && squares.every(Boolean);
+  const { squares, winner, nextPlayer, isOver } = applyGameState(game);
 
   let status: string;
   if (winner) {
     status = `Winner: ${winner.player}`;
-  } else if (isDraw) {
+  } else if (isOver) {
     status = "It's a draw!";
   } else {
-    status = `Next player: ${xIsNext ? "X" : "O"}`;
+    status = `Next player: ${nextPlayer}`;
   }
 
-  function handleCellClick(i: number) {
-    if (squares[i] || winner) {
+  async function handleCellClick(i: number) {
+    if (squares[i] || isOver || submitting) {
       return;
     }
-    const next = squares.slice();
-    next[i] = xIsNext ? "X" : "O";
-    setSquares(next);
-    setXIsNext(!xIsNext);
+    const playerId = nextPlayer === "X" ? game.playerXId : game.playerOId;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const updated = await submitMove(game.id, playerId, i);
+      setGame(updated);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Move failed");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -47,6 +52,7 @@ export function GameBoard({ game, onNewGame }: GameBoardProps) {
         winningLine={winner?.line ?? []}
         onCellClick={handleCellClick}
       />
+      {error && <div className="error">{error}</div>}
       <button onClick={onNewGame} className="reset">
         New Game
       </button>
