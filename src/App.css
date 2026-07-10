@@ -71,3 +71,52 @@ h1 {
 .reset:hover {
   background: #2563eb;
 }
+
+.reset:disabled {
+  background: #4b5563;
+  cursor: not-allowed;
+}
+
+.new-game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 20rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.field input {
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
+  border: 2px solid #4b5563;
+  border-radius: 0.5rem;
+  background: #1f2937;
+  color: #f9fafb;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.players {
+  font-size: 0.95rem;
+  color: #9ca3af;
+}
+
+.error {
+  color: #ef4444;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
