@@ -8,7 +8,6 @@ export type User = {
 };
 
 export type RegisterUserRequest = {
-  userId: string;
   email: string;
   username: string;
   firstName: string;

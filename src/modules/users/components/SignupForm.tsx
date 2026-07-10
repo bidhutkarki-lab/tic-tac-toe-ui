@@ -8,7 +8,6 @@ type SignupFormProps = {
 };
 
 export function SignupForm({ onRegistered }: SignupFormProps) {
-  const [userId, setUserId] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -22,7 +21,6 @@ export function SignupForm({ onRegistered }: SignupFormProps) {
     setError(null);
     try {
       const user = await registerUser({
-        userId: userId.trim(),
         email: email.trim(),
         username: username.trim(),
         firstName: firstName.trim(),
@@ -38,8 +36,7 @@ export function SignupForm({ onRegistered }: SignupFormProps) {
 
   const canSubmit =
     Boolean(
-      userId.trim() &&
-        email.trim() &&
+      email.trim() &&
         username.trim() &&
         firstName.trim() &&
         lastName.trim(),
@@ -48,14 +45,6 @@ export function SignupForm({ onRegistered }: SignupFormProps) {
   return (
     <form className="new-game" onSubmit={handleSubmit}>
       <h1>Sign Up</h1>
-      <label className="field">
-        User ID
-        <input
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          placeholder="User ID"
-        />
-      </label>
       <label className="field">
         Email
         <input
