@@ -1,0 +1,111 @@
+.admin-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 2rem 1.5rem;
+  width: 100%;
+}
+
+.admin-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  max-width: 60rem;
+}
+
+.admin-title {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: 0.03em;
+  background: linear-gradient(90deg, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.admin-subtitle {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+.admin-refresh {
+  padding: 0.55rem 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 0.6rem;
+  background: #1f2937;
+  color: #e5e7eb;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-refresh:hover:not(:disabled) {
+  background: #273244;
+  border-color: #3b82f6;
+}
+
+.admin-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-status {
+  color: #9ca3af;
+  font-size: 1rem;
+  padding: 2rem 0;
+}
+
+.admin-error {
+  width: 100%;
+  max-width: 60rem;
+  padding: 0.7rem 1rem;
+  border-radius: 0.6rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.admin-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 60rem;
+}
+
+.admin-page-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 0.6rem;
+  background: #1f2937;
+  color: #e5e7eb;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-page-btn:hover:not(:disabled) {
+  background: #273244;
+  border-color: #3b82f6;
+}
+
+.admin-page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.admin-page-info {
+  font-size: 0.9rem;
+  color: #9ca3af;
+  font-variant-numeric: tabular-nums;
+}
