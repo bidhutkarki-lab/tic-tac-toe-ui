@@ -1,14 +1,13 @@
 import type { Cell, Game, GameView } from "./types";
 import { boardToSquares, calculateWinner } from "./gameLogic";
+import { extractErrorMessage } from "../../shared/http";
 
 const API_BASE = "/api/games";
 
 async function asGame(res: Response, action: string): Promise<Game> {
   if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(
-      `${action} failed (${res.status})${detail ? `: ${detail}` : ""}`,
-    );
+    const message = extractErrorMessage(await res.text().catch(() => ""));
+    throw new Error(message ?? `${action} failed. Please try again.`);
   }
   return res.json();
 }

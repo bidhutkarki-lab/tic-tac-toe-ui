@@ -1,4 +1,5 @@
 import type { AdminUser, Page } from "./types";
+import { extractErrorMessage } from "../../shared/http";
 
 const USERS_BASE = "/api/admin/users";
 
@@ -12,10 +13,8 @@ export async function listUsers(
   });
   const res = await fetch(`${USERS_BASE}?${params}`);
   if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(
-      `Load users failed (${res.status})${detail ? `: ${detail}` : ""}`,
-    );
+    const message = extractErrorMessage(await res.text().catch(() => ""));
+    throw new Error(message ?? "Load users failed. Please try again.");
   }
   return res.json();
 }

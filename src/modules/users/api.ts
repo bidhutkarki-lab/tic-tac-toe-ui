@@ -1,4 +1,5 @@
 import type { RegisterUserRequest, User } from "./types";
+import { extractErrorMessage } from "../../shared/http";
 
 const USERS_BASE = "/api/users";
 
@@ -9,10 +10,9 @@ export async function registerUser(req: RegisterUserRequest): Promise<User> {
     body: JSON.stringify(req),
   });
   if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(
-      `Register user failed (${res.status})${detail ? `: ${detail}` : ""}`,
-    );
+    const body = await res.text().catch(() => "");
+    const message = extractErrorMessage(body);
+    throw new Error(message ?? "Something went wrong. Please try again.");
   }
   return res.json();
 }
