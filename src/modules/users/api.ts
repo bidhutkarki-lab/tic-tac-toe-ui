@@ -3,7 +3,7 @@ import type { RegisterUserRequest, User } from "./types";
 const USERS_BASE = "/api/users";
 
 export async function registerUser(req: RegisterUserRequest): Promise<User> {
-  const res = await fetch(`${USERS_BASE}`, {
+  const res = await fetch(`${USERS_BASE}/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(req),
