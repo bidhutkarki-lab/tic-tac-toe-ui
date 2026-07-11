@@ -54,7 +54,9 @@ export function SignupForm({ onRegistered }: SignupFormProps) {
       <p className="signup-subtitle">Join the game in a few seconds</p>
 
       <label className="signup-field">
-        First Name <span className="required">*</span>
+        <span className="signup-label">
+          First Name <span className="required">*</span>
+        </span>
         <input
           className="signup-input"
           value={firstName}
@@ -64,7 +66,9 @@ export function SignupForm({ onRegistered }: SignupFormProps) {
         />
       </label>
       <label className="signup-field">
-        Last Name <span className="required">*</span>
+        <span className="signup-label">
+          Last Name <span className="required">*</span>
+        </span>
         <input
           className="signup-input"
           value={lastName}
@@ -74,7 +78,9 @@ export function SignupForm({ onRegistered }: SignupFormProps) {
         />
       </label>
       <label className="signup-field">
-        Username <span className="required">*</span>
+        <span className="signup-label">
+          Username <span className="required">*</span>
+        </span>
         <input
           className="signup-input"
           value={username}
@@ -84,7 +90,9 @@ export function SignupForm({ onRegistered }: SignupFormProps) {
         />
       </label>
       <label className="signup-field">
-        Email <span className="required">*</span>
+        <span className="signup-label">
+          Email <span className="required">*</span>
+        </span>
         <input
           className="signup-input"
           type="email"
@@ -95,7 +103,9 @@ export function SignupForm({ onRegistered }: SignupFormProps) {
         />
       </label>
       <label className="signup-field">
-        Password <span className="required">*</span>
+        <span className="signup-label">
+          Password <span className="required">*</span>
+        </span>
         <input
           className="signup-input"
           type="password"
