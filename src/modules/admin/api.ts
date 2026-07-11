@@ -1,7 +1,7 @@
 import type { AdminUser, Page } from "./types";
 import { extractErrorMessage } from "../../shared/http";
 
-const USERS_BASE = "/api/admin/users";
+const USERS_BASE = "/tic-tac-toe/admin/users";
 
 export async function listUsers(
   page = 0,

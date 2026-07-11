@@ -8,9 +8,9 @@ export function LoginPage() {
   return (
     <div className="game">
       <LoginForm
-        onLoggedIn={(user) => {
+        onLoggedIn={() => {
           toaster.create({
-            title: `Welcome back, ${user.firstName}!`,
+            title: "Welcome back!",
             description: "You are now logged in.",
             type: "success",
           });

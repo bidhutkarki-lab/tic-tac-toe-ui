@@ -7,7 +7,11 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
-      "/api": {
+      "/tic-tac-toe": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+      "/auth": {
         target: "http://localhost:8080",
         changeOrigin: true,
       },

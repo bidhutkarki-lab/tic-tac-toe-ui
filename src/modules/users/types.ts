@@ -16,6 +16,13 @@ export type RegisterUserRequest = {
 };
 
 export type LoginRequest = {
-  identifier: string;
+  email: string;
   password: string;
+};
+
+export type LoginResponse = {
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  expiresInSeconds: number;
 };

@@ -2,7 +2,7 @@ import type { Cell, Game, GameView } from "./types";
 import { boardToSquares, calculateWinner } from "./gameLogic";
 import { extractErrorMessage } from "../../shared/http";
 
-const API_BASE = "/api/games";
+const API_BASE = "/tic-tac-toe";
 
 async function asGame(res: Response, action: string): Promise<Game> {
   if (!res.ok) {

@@ -1,16 +1,15 @@
 import { useState } from "react";
 import type { SyntheticEvent } from "react";
 import { loginUser } from "../api";
-import type { User } from "../types";
 import logo from "../../../assets/tic_tac_toe.svg";
 import "./SignupForm.css";
 
 type LoginFormProps = {
-  onLoggedIn: (user: User) => void;
+  onLoggedIn: () => void;
 };
 
 export function LoginForm({ onLoggedIn }: LoginFormProps) {
-  const [identifier, setIdentifier] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,11 +19,11 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
     setLoading(true);
     setError(null);
     try {
-      const user = await loginUser({
-        identifier: identifier.trim(),
+      await loginUser({
+        email: email.trim(),
         password,
       });
-      onLoggedIn(user);
+      onLoggedIn();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -32,7 +31,7 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
     }
   }
 
-  const canSubmit = Boolean(identifier.trim() && password) && !loading;
+  const canSubmit = Boolean(email.trim() && password) && !loading;
 
   return (
     <form className="signup-card" onSubmit={handleSubmit}>
@@ -46,8 +45,8 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
         </span>
         <input
           className="signup-input"
-          value={identifier}
-          onChange={(e) => setIdentifier(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
           autoComplete="username"
           required
