@@ -14,3 +14,8 @@ export type RegisterUserRequest = {
   email: string;
   password: string;
 };
+
+export type LoginRequest = {
+  identifier: string;
+  password: string;
+};
