@@ -5,7 +5,7 @@ import type {
   User,
 } from "./types";
 import { apiFetch, extractErrorMessage } from "../../shared/http";
-import { storeTokens } from "../../shared/auth";
+import { storeTokens, storeUserId, storeUsername } from "../../shared/auth";
 
 const USERS_BASE = "/tic-tac-toe";
 
@@ -19,7 +19,10 @@ export async function registerUser(req: RegisterUserRequest): Promise<User> {
     const message = extractErrorMessage(body);
     throw new Error(message ?? "Something went wrong. Please try again.");
   }
-  return res.json();
+  const user: User = await res.json();
+  storeUserId(String(user.id));
+  storeUsername(user.username);
+  return user;
 }
 
 export async function loginUser(req: LoginRequest): Promise<LoginResponse> {
