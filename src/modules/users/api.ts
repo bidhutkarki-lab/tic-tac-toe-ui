@@ -4,15 +4,14 @@ import type {
   RegisterUserRequest,
   User,
 } from "./types";
-import { extractErrorMessage } from "../../shared/http";
+import { apiFetch, extractErrorMessage } from "../../shared/http";
 import { storeTokens } from "../../shared/auth";
 
 const USERS_BASE = "/tic-tac-toe";
 
 export async function registerUser(req: RegisterUserRequest): Promise<User> {
-  const res = await fetch(`${USERS_BASE}/register`, {
+  const res = await apiFetch(`${USERS_BASE}/register`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(req),
   });
   if (!res.ok) {
@@ -24,9 +23,8 @@ export async function registerUser(req: RegisterUserRequest): Promise<User> {
 }
 
 export async function loginUser(req: LoginRequest): Promise<LoginResponse> {
-  const res = await fetch("/auth/login", {
+  const res = await apiFetch("/auth/login", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(req),
   });
   if (!res.ok) {

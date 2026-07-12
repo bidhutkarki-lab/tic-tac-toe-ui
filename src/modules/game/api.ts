@@ -1,8 +1,8 @@
 import type { Cell, Game, GameView } from "./types";
 import { boardToSquares, calculateWinner } from "./gameLogic";
-import { extractErrorMessage } from "../../shared/http";
+import { apiFetch, extractErrorMessage } from "../../shared/http";
 
-const API_BASE = "/tic-tac-toe";
+const API_BASE = "/tic-tac-toe/games";
 
 async function asGame(res: Response, action: string): Promise<Game> {
   if (!res.ok) {
@@ -16,9 +16,8 @@ export async function createGame(
   playerXId: string,
   playerOId: string,
 ): Promise<Game> {
-  const res = await fetch(`${API_BASE}`, {
+  const res = await apiFetch(`${API_BASE}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ playerXId, playerOId }),
   });
   return asGame(res, "Create game");
@@ -29,16 +28,15 @@ export async function submitMove(
   playerId: number,
   cell: number,
 ): Promise<Game> {
-  const res = await fetch(`${API_BASE}/${gameId}/moves`, {
+  const res = await apiFetch(`${API_BASE}/${gameId}/moves`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ playerId, cell }),
   });
   return asGame(res, "Submit move");
 }
 
 export async function getGame(gameId: number): Promise<Game> {
-  const res = await fetch(`${API_BASE}/${gameId}`);
+  const res = await apiFetch(`${API_BASE}/${gameId}`);
   return asGame(res, "Load game");
 }
 
