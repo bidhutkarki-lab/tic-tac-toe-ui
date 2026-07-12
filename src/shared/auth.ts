@@ -24,6 +24,10 @@ export function clearTokens(): void {
   localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
+export function isAuthenticated(): boolean {
+  return getAccessToken() != null;
+}
+
 export function authHeader(): Record<string, string> {
   const token = getAccessToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
