@@ -4,6 +4,7 @@ import { HomePage } from "./modules/game/pages/HomePage";
 import { GamePage } from "./modules/game/pages/GamePage";
 import { SignupPage } from "./modules/users/pages/SignupPage";
 import { LoginPage } from "./modules/users/pages/LoginPage";
+import { LogoutPage } from "./modules/users/pages/LogoutPage";
 import { AdminPage } from "./modules/admin/pages/AdminPage";
 import { PlayPage } from "./modules/players/pages/PlayPage";
 import { GuestRoute, ProtectedRoute } from "./shared/RouteGuards";
@@ -15,6 +16,8 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
       </Route>
+
+      <Route path="/logout" element={<LogoutPage />} />
 
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<HomePage />} />
