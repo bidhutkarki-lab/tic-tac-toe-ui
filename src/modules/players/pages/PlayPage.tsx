@@ -11,10 +11,10 @@ export function PlayPage() {
         onCreated={(player) => {
           toaster.create({
             title: `You're in, ${player.username}!`,
-            description: "Your player is ready.",
+            description: "Share your game link to invite another player.",
             type: "success",
           });
-          navigate("/");
+          navigate(`/lobby/${player.id}`);
         }}
       />
     </div>
