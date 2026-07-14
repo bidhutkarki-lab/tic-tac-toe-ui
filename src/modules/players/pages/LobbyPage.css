@@ -119,3 +119,88 @@
     transform: rotate(360deg);
   }
 }
+
+.lobby-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+  text-align: left;
+}
+
+.lobby-field-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.lobby-input {
+  padding: 0.7rem 0.85rem;
+  font-size: 1rem;
+  border: 1.5px solid #374151;
+  border-radius: 0.65rem;
+  background: #111827;
+  color: #f9fafb;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.lobby-input::placeholder {
+  color: #6b7280;
+}
+
+.lobby-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #0f1723;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.lobby-button {
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.75rem 1.4rem;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: none;
+  border-radius: 0.65rem;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+  box-shadow: 0 10px 20px -8px rgba(79, 70, 229, 0.7);
+  transition: transform 0.05s ease, filter 0.15s ease;
+}
+
+.lobby-button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.lobby-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.lobby-button:disabled {
+  background: #374151;
+  box-shadow: none;
+  cursor: not-allowed;
+  color: #9ca3af;
+}
+
+.lobby-joined {
+  margin: 0;
+  font-size: 1rem;
+  color: #86efac;
+  text-align: center;
+}
+
+.lobby-error {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.5rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: left;
+}
