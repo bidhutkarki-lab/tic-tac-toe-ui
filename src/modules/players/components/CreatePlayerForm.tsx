@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { SyntheticEvent } from "react";
 import { registerPlayer } from "../api";
 import type { Player } from "../types";
-import { getUserId, getUsername } from "../../../shared/auth";
+import { getUsername } from "../../../shared/auth";
 import logo from "../../../assets/tic_tac_toe.svg";
 import "../../users/components/SignupForm.css";
 
@@ -15,15 +15,12 @@ export function CreatePlayerForm({ onCreated }: CreatePlayerFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const userId = getUserId();
-
   async function handleSubmit(e: SyntheticEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
       const player = await registerPlayer({
-        profileId: userId ?? undefined,
         username: username.trim(),
       });
       onCreated(player);

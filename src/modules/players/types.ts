@@ -5,6 +5,5 @@ export type Player = {
 };
 
 export type RegisterPlayerRequest = {
-  profileId?: string;
   username: string;
 };

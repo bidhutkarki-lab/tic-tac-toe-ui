@@ -3,7 +3,7 @@ import type { SyntheticEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import logo from "../../../assets/tic_tac_toe.svg";
 import { registerPlayer } from "../api";
-import { getUserId, getUsername } from "../../../shared/auth";
+import { getUsername } from "../../../shared/auth";
 import { createGame } from "../../game/api";
 import type { Room } from "../../rooms/types";
 import {
@@ -29,7 +29,7 @@ export function LobbyPage() {
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const userId = getUserId();
+  // Poll the (mock) room store
 
   // Poll the (mock) room store so a host tab sees a guest join and a guest tab
   // sees the game start. Swap for a backend GET / WebSocket later.
@@ -75,7 +75,6 @@ export function LobbyPage() {
     setError(null);
     try {
       const player = await registerPlayer({
-        profileId: userId ?? undefined,
         username: guestName.trim(),
       });
       const updated = joinRoom(roomId!, player.id, player.username);

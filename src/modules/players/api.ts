@@ -17,3 +17,16 @@ export async function registerPlayer(
   }
   return res.json();
 }
+
+// Returns the player for the authenticated user, or null if they don't have one
+// yet (backend responds 404). Used to skip the create-player step on /play.
+export async function getMyPlayer(): Promise<Player | null> {
+  const res = await apiFetch(`${PLAYERS_BASE}/me`);
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    const message = extractErrorMessage(body);
+    throw new Error(message ?? "Could not load your player. Please try again.");
+  }
+  return res.json();
+}
