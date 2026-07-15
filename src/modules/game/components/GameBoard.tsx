@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Game } from "../types";
 import { applyGameState, submitMove } from "../api";
+import { getPlayer } from "../../players/api";
 import { Board } from "./Board";
 
 type GameBoardProps = {
@@ -12,17 +13,38 @@ export function GameBoard({ game: initialGame, onNewGame }: GameBoardProps) {
   const [game, setGame] = useState(initialGame);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [names, setNames] = useState<Record<string, string>>({});
+
+  // Resolve player usernames so the board shows names instead of raw ids.
+  useEffect(() => {
+    const ids = [game.playerXId, game.playerOId].filter(
+      (id): id is number => id != null,
+    );
+    let active = true;
+    Promise.all(
+      ids.map((id) =>
+        getPlayer(String(id))
+          .then((p) => [String(id), p.username] as const)
+          .catch(() => [String(id), String(id)] as const),
+      ),
+    ).then((entries) => {
+      if (active) setNames(Object.fromEntries(entries));
+    });
+    return () => {
+      active = false;
+    };
+  }, [game.playerXId, game.playerOId]);
+
+  const nameFor = (id: number | null) =>
+    id == null ? "…" : (names[String(id)] ?? String(id));
 
   const { squares, winner, nextPlayer, isOver } = applyGameState(game);
-  const waitingForOpponent = game.playerOId == null;
 
   let status: string;
   if (winner) {
     status = `Winner: ${winner.player}`;
   } else if (isOver) {
     status = "It's a draw!";
-  } else if (waitingForOpponent) {
-    status = "Waiting for an opponent to join…";
   } else {
     status = `Next player: ${nextPlayer}`;
   }
@@ -50,8 +72,8 @@ export function GameBoard({ game: initialGame, onNewGame }: GameBoardProps) {
   return (
     <div className="game">
       <div className="players">
-        Game #{game.id} · X: {game.playerXId} vs O:{" "}
-        {game.playerOId ?? "waiting…"}
+        Game #{game.id} · X: {nameFor(game.playerXId)} vs O:{" "}
+        {nameFor(game.playerOId)}
       </div>
       <div className={`status${winner ? " status--win" : ""}`}>{status}</div>
       <Board

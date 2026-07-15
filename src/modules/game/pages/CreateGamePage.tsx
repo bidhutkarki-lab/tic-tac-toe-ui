@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreatePlayerForm } from "../../players/components/CreatePlayerForm";
 import { toaster } from "../../../shared/toaster";
-import { createRoom } from "../../rooms/api";
+import { createGame } from "../api";
 import { getMyPlayer } from "../../players/api";
 import type { Player } from "../../players/types";
 
@@ -10,6 +10,7 @@ export function CreateGamePage() {
   const navigate = useNavigate();
   const [player, setPlayer] = useState<Player | null>(null);
   const [loading, setLoading] = useState(true);
+  const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Load the existing player (if any) so we can skip the create-player step.
@@ -32,9 +33,16 @@ export function CreateGamePage() {
     };
   }, []);
 
-  function startGame(playerX: Player) {
-    const room = createRoom(playerX.id, playerX.username);
-    navigate(`/lobby/${room.roomId}`);
+  async function startGame(playerX: Player) {
+    setStarting(true);
+    setError(null);
+    try {
+      const game = await createGame(playerX.id);
+      navigate(`/lobby/${game.id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+      setStarting(false);
+    }
   }
 
   if (loading) {
@@ -77,8 +85,8 @@ export function CreateGamePage() {
           Playing as <strong>{player.username}</strong> (X)
         </p>
         {error && <div className="error">{error}</div>}
-        <button type="submit" className="reset">
-          Start Game
+        <button type="submit" className="reset" disabled={starting}>
+          {starting ? "Starting…" : "Start Game"}
         </button>
       </form>
     </div>

@@ -2,54 +2,68 @@ import { useEffect, useState } from "react";
 import type { SyntheticEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import logo from "../../../assets/tic_tac_toe.svg";
-import { registerPlayer } from "../api";
+import { getMyPlayer, registerPlayer } from "../api";
 import { getUsername } from "../../../shared/auth";
-import { createGame, joinGame } from "../../game/api";
-import type { Room } from "../../rooms/types";
-import {
-  getRole,
-  getRoom,
-  joinRoom,
-  setRoomGame,
-  type RoomRole,
-} from "../../rooms/api";
+import { getGame, joinGame } from "../../game/api";
+import type { Game } from "../../game/types";
+import type { Player } from "../types";
 import "./LobbyPage.css";
 
 export function LobbyPage() {
   const { roomId } = useParams();
   const navigate = useNavigate();
+  const gameId = Number(roomId);
 
-  const [room, setRoom] = useState<Room | null | undefined>(undefined);
-  const [role, setRole] = useState<RoomRole | null>(
-    roomId ? getRole(roomId) : null,
-  );
+  const [game, setGame] = useState<Game | null | undefined>(undefined);
+  const [me, setMe] = useState<Player | null>(null);
+  const [meLoaded, setMeLoaded] = useState(false);
   const [copied, setCopied] = useState(false);
   const [guestName, setGuestName] = useState(getUsername() ?? "");
   const [joining, setJoining] = useState(false);
-  const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Poll the (mock) room store
-
-  // Poll the (mock) room store so a host tab sees a guest join and a guest tab
-  // sees the game start. Swap for a backend GET / WebSocket later.
+  // Load the current user's player once so we can tell host from guest.
   useEffect(() => {
-    if (!roomId) return;
-    const tick = () => setRoom(getRoom(roomId));
+    let active = true;
+    getMyPlayer()
+      .then((p) => active && setMe(p))
+      .catch(() => active && setMe(null))
+      .finally(() => active && setMeLoaded(true));
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // A room only exists when there is a valid game. Poll it so a host tab sees a
+  // guest join. Swap for a backend WebSocket push later.
+  useEffect(() => {
+    if (!Number.isInteger(gameId)) return;
+    let active = true;
+    const tick = async () => {
+      try {
+        const g = await getGame(gameId);
+        if (active) setGame(g);
+      } catch {
+        if (active) setGame(null);
+      }
+    };
     tick();
     const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [roomId]);
+    return () => {
+      active = false;
+      clearInterval(id);
+    };
+  }, [gameId]);
 
-  // Once the host starts, everyone in the room jumps to the board.
+  // Once the second player has joined, everyone jumps to the board.
   useEffect(() => {
-    if (room && room.gameId != null) navigate(`/game/${room.gameId}`);
-  }, [room, navigate]);
+    if (game && game.playerOId != null) navigate(`/game/${game.id}`);
+  }, [game, navigate]);
 
-  if (!roomId) {
+  if (!roomId || !Number.isInteger(gameId)) {
     return (
       <div className="game">
-        <div className="error">Missing room id.</div>
+        <div className="error">Missing game id.</div>
         <button className="reset" onClick={() => navigate("/play")}>
           Back to Play
         </button>
@@ -74,12 +88,11 @@ export function LobbyPage() {
     setJoining(true);
     setError(null);
     try {
-      const player = await registerPlayer({
-        username: guestName.trim(),
-      });
-      const updated = joinRoom(roomId!, player.id, player.username);
-      setRole("guest");
-      setRoom(updated);
+      const player =
+        me ?? (await registerPlayer({ username: guestName.trim() }));
+      const updated = await joinGame(gameId, player.id);
+      setMe(player);
+      setGame(updated);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not join the game.");
     } finally {
@@ -87,22 +100,7 @@ export function LobbyPage() {
     }
   }
 
-  async function handleStart() {
-    if (!room?.guestPlayerId) return;
-    setStarting(true);
-    setError(null);
-    try {
-      const created = await createGame(room.hostPlayerId);
-      const game = await joinGame(created.id, room.guestPlayerId);
-      setRoom(setRoomGame(roomId!, game.id));
-      navigate(`/game/${game.id}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not start the game.");
-      setStarting(false);
-    }
-  }
-
-  if (room === undefined) {
+  if (game === undefined || !meLoaded) {
     return (
       <div className="game">
         <div className="status">Loading room…</div>
@@ -110,7 +108,7 @@ export function LobbyPage() {
     );
   }
 
-  if (room === null) {
+  if (game === null) {
     return (
       <div className="game">
         <div className="error">This room doesn’t exist or has expired.</div>
@@ -121,78 +119,41 @@ export function LobbyPage() {
     );
   }
 
-  const hasGuest = Boolean(room.guestPlayerId);
+  const isHost = Boolean(me) && String(game.playerXId) === me!.id;
+  const hasGuest = game.playerOId != null;
 
-  // Host: share the link, then start once someone joins.
-  if (role === "host") {
+  // Host: share the link and wait for someone to join.
+  if (isHost) {
     return (
       <div className="game">
         <div className="lobby-card">
           <img className="lobby-logo" src={logo} alt="Tic Tac Toe logo" />
           <h1 className="lobby-title">Waiting Room</h1>
-
-          {!hasGuest ? (
-            <>
-              <p className="lobby-subtitle">
-                Share this link to invite another player to your game.
-              </p>
-              <div className="lobby-share">
-                <input
-                  className="lobby-url"
-                  value={shareUrl}
-                  readOnly
-                  onFocus={(e) => e.target.select()}
-                  aria-label="Game invite link"
-                />
-                <button className="lobby-copy" onClick={handleCopy}>
-                  {copied ? "Copied!" : "Copy"}
-                </button>
-              </div>
-              <div className="lobby-status">
-                <span className="lobby-spinner" aria-hidden="true" />
-                Waiting for another player to join…
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="lobby-joined">
-                <strong>{room.guestUsername}</strong> joined your game!
-              </p>
-              {error && <div className="lobby-error">{error}</div>}
-              <button
-                className="lobby-button"
-                onClick={handleStart}
-                disabled={starting}
-              >
-                {starting ? "Starting…" : "Start game"}
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Guest who already joined: wait for the host to start.
-  if (role === "guest") {
-    return (
-      <div className="game">
-        <div className="lobby-card">
-          <img className="lobby-logo" src={logo} alt="Tic Tac Toe logo" />
-          <h1 className="lobby-title">You're in!</h1>
           <p className="lobby-subtitle">
-            Joined <strong>{room.hostUsername}</strong>'s game.
+            Share this link to invite another player to your game.
           </p>
+          <div className="lobby-share">
+            <input
+              className="lobby-url"
+              value={shareUrl}
+              readOnly
+              onFocus={(e) => e.target.select()}
+              aria-label="Game invite link"
+            />
+            <button className="lobby-copy" onClick={handleCopy}>
+              {copied ? "Copied!" : "Copy"}
+            </button>
+          </div>
           <div className="lobby-status">
             <span className="lobby-spinner" aria-hidden="true" />
-            Waiting for the host to start the game…
+            Waiting for another player to join…
           </div>
         </div>
       </div>
     );
   }
 
-  // Visitor opened the link but the room is already full.
+  // Visitor opened the link but the game is already full.
   if (hasGuest) {
     return (
       <div className="game">
@@ -209,27 +170,29 @@ export function LobbyPage() {
   }
 
   // Visitor opened the link: let them join as the second player.
-  const canJoin = Boolean(guestName.trim()) && !joining;
+  const canJoin = Boolean(me) || (Boolean(guestName.trim()) && !joining);
   return (
     <div className="game">
       <form className="lobby-card" onSubmit={handleJoin}>
         <img className="lobby-logo" src={logo} alt="Tic Tac Toe logo" />
         <h1 className="lobby-title">Join Game</h1>
         <p className="lobby-subtitle">
-          <strong>{room.hostUsername}</strong> invited you to play tic tac toe.
+          You've been invited to play tic tac toe.
         </p>
 
-        <label className="lobby-field">
-          <span className="lobby-field-label">Your name</span>
-          <input
-            className="lobby-input"
-            value={guestName}
-            onChange={(e) => setGuestName(e.target.value)}
-            placeholder="Your player name"
-            autoComplete="off"
-            required
-          />
-        </label>
+        {!me && (
+          <label className="lobby-field">
+            <span className="lobby-field-label">Your name</span>
+            <input
+              className="lobby-input"
+              value={guestName}
+              onChange={(e) => setGuestName(e.target.value)}
+              placeholder="Your player name"
+              autoComplete="off"
+              required
+            />
+          </label>
+        )}
 
         {error && <div className="lobby-error">{error}</div>}
         <button type="submit" className="lobby-button" disabled={!canJoin}>
