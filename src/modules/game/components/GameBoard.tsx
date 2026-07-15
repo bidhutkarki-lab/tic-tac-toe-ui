@@ -14,12 +14,15 @@ export function GameBoard({ game: initialGame, onNewGame }: GameBoardProps) {
   const [submitting, setSubmitting] = useState(false);
 
   const { squares, winner, nextPlayer, isOver } = applyGameState(game);
+  const waitingForOpponent = game.playerOId == null;
 
   let status: string;
   if (winner) {
     status = `Winner: ${winner.player}`;
   } else if (isOver) {
     status = "It's a draw!";
+  } else if (waitingForOpponent) {
+    status = "Waiting for an opponent to join…";
   } else {
     status = `Next player: ${nextPlayer}`;
   }
@@ -29,6 +32,9 @@ export function GameBoard({ game: initialGame, onNewGame }: GameBoardProps) {
       return;
     }
     const playerId = nextPlayer === "X" ? game.playerXId : game.playerOId;
+    if (playerId == null) {
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
@@ -44,7 +50,8 @@ export function GameBoard({ game: initialGame, onNewGame }: GameBoardProps) {
   return (
     <div className="game">
       <div className="players">
-        Game #{game.id} · X: {game.playerXId} vs O: {game.playerOId}
+        Game #{game.id} · X: {game.playerXId} vs O:{" "}
+        {game.playerOId ?? "waiting…"}
       </div>
       <div className={`status${winner ? " status--win" : ""}`}>{status}</div>
       <Board

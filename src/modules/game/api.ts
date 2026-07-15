@@ -12,13 +12,10 @@ async function asGame(res: Response, action: string): Promise<Game> {
   return res.json();
 }
 
-export async function createGame(
-  playerXId: string,
-  playerOId: string,
-): Promise<Game> {
+export async function createGame(playerXId: string): Promise<Game> {
   const res = await apiFetch(`${API_BASE}`, {
     method: "POST",
-    body: JSON.stringify({ playerXId, playerOId }),
+    body: JSON.stringify({ playerXId }),
   });
   return asGame(res, "Create game");
 }

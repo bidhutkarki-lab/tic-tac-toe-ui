@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import logo from "../../../assets/tic_tac_toe.svg";
 import { registerPlayer } from "../api";
 import { getUsername } from "../../../shared/auth";
-import { createGame } from "../../game/api";
+import { createGame, joinGame } from "../../game/api";
 import type { Room } from "../../rooms/types";
 import {
   getRole,
@@ -92,7 +92,8 @@ export function LobbyPage() {
     setStarting(true);
     setError(null);
     try {
-      const game = await createGame(room.hostPlayerId, room.guestPlayerId);
+      const created = await createGame(room.hostPlayerId);
+      const game = await joinGame(created.id, room.guestPlayerId);
       setRoom(setRoomGame(roomId!, game.id));
       navigate(`/game/${game.id}`);
     } catch (err) {

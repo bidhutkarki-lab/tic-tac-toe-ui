@@ -5,7 +5,7 @@ export type Cell = "X" | "O" | null;
 export type Game = {
   id: number;
   playerXId: number;
-  playerOId: number;
+  playerOId: number | null;
   board: string;
   status: GameStatus;
   createdAt: string;
