@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import logo from "../../../assets/tic_tac_toe.svg";
 import { getMyPlayer, registerPlayer } from "../api";
 import { getUsername } from "../../../shared/auth";
-import { getGame, joinGame } from "../../game/api";
+import { getGame, joinGame, startGame } from "../../game/api";
 import type { Game } from "../../game/types";
 import type { Player } from "../types";
 import "./LobbyPage.css";
@@ -20,6 +20,7 @@ export function LobbyPage() {
   const [copied, setCopied] = useState(false);
   const [guestName, setGuestName] = useState(getUsername() ?? "");
   const [joining, setJoining] = useState(false);
+  const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Load the current user's player once so we can tell host from guest.
@@ -55,9 +56,9 @@ export function LobbyPage() {
     };
   }, [gameId]);
 
-  // Once the second player has joined, everyone jumps to the board.
+  // Once the host starts the game, everyone jumps to the board.
   useEffect(() => {
-    if (game && game.playerOId != null) navigate(`/game/${game.id}`);
+    if (game && game.status === "IN_PROGRESS") navigate(`/game/${game.id}`);
   }, [game, navigate]);
 
   if (!roomId || !Number.isInteger(gameId)) {
@@ -100,6 +101,19 @@ export function LobbyPage() {
     }
   }
 
+  async function handleStart() {
+    setStarting(true);
+    setError(null);
+    try {
+      const updated = await startGame(gameId);
+      setGame(updated);
+      navigate(`/game/${updated.id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not start the game.");
+      setStarting(false);
+    }
+  }
+
   if (game === undefined || !meLoaded) {
     return (
       <div className="game">
@@ -120,33 +134,68 @@ export function LobbyPage() {
   }
 
   const isHost = Boolean(me) && String(game.playerXId) === me!.id;
+  const isGuest =
+    Boolean(me) && game.playerOId != null && String(game.playerOId) === me!.id;
   const hasGuest = game.playerOId != null;
 
-  // Host: share the link and wait for someone to join.
+  // Host: share the link, then start the game once someone joins.
   if (isHost) {
     return (
       <div className="game">
         <div className="lobby-card">
           <img className="lobby-logo" src={logo} alt="Tic Tac Toe logo" />
           <h1 className="lobby-title">Waiting Room</h1>
-          <p className="lobby-subtitle">
-            Share this link to invite another player to your game.
-          </p>
-          <div className="lobby-share">
-            <input
-              className="lobby-url"
-              value={shareUrl}
-              readOnly
-              onFocus={(e) => e.target.select()}
-              aria-label="Game invite link"
-            />
-            <button className="lobby-copy" onClick={handleCopy}>
-              {copied ? "Copied!" : "Copy"}
-            </button>
-          </div>
+
+          {!hasGuest ? (
+            <>
+              <p className="lobby-subtitle">
+                Share this link to invite another player to your game.
+              </p>
+              <div className="lobby-share">
+                <input
+                  className="lobby-url"
+                  value={shareUrl}
+                  readOnly
+                  onFocus={(e) => e.target.select()}
+                  aria-label="Game invite link"
+                />
+                <button className="lobby-copy" onClick={handleCopy}>
+                  {copied ? "Copied!" : "Copy"}
+                </button>
+              </div>
+              <div className="lobby-status">
+                <span className="lobby-spinner" aria-hidden="true" />
+                Waiting for another player to join…
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="lobby-joined">Another player joined your game!</p>
+              {error && <div className="lobby-error">{error}</div>}
+              <button
+                className="lobby-button"
+                onClick={handleStart}
+                disabled={starting}
+              >
+                {starting ? "Starting…" : "Start game"}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Guest who already joined: wait for the host to start.
+  if (isGuest) {
+    return (
+      <div className="game">
+        <div className="lobby-card">
+          <img className="lobby-logo" src={logo} alt="Tic Tac Toe logo" />
+          <h1 className="lobby-title">You're in!</h1>
           <div className="lobby-status">
             <span className="lobby-spinner" aria-hidden="true" />
-            Waiting for another player to join…
+            Waiting for the host to start the game…
           </div>
         </div>
       </div>

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import type { Game } from "../types";
+import type { Cell, Game } from "../types";
 import { applyGameState, submitMove } from "../api";
-import { getPlayer } from "../../players/api";
+import { getMyPlayer, getPlayer } from "../../players/api";
+import type { Player } from "../../players/types";
 import { Board } from "./Board";
 
 type GameBoardProps = {
@@ -14,6 +15,18 @@ export function GameBoard({ game: initialGame, onNewGame }: GameBoardProps) {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [names, setNames] = useState<Record<string, string>>({});
+  const [me, setMe] = useState<Player | null>(null);
+
+  // Load the viewer's player so we can enforce turn order.
+  useEffect(() => {
+    let active = true;
+    getMyPlayer()
+      .then((p) => active && setMe(p))
+      .catch(() => active && setMe(null));
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Resolve player usernames so the board shows names instead of raw ids.
   useEffect(() => {
@@ -40,17 +53,28 @@ export function GameBoard({ game: initialGame, onNewGame }: GameBoardProps) {
 
   const { squares, winner, nextPlayer, isOver } = applyGameState(game);
 
+  const myMark: Cell = !me
+    ? null
+    : String(game.playerXId) === me.id
+      ? "X"
+      : String(game.playerOId) === me.id
+        ? "O"
+        : null;
+  const isMyTurn = myMark != null && myMark === nextPlayer && !isOver;
+
   let status: string;
   if (winner) {
     status = `Winner: ${winner.player}`;
   } else if (isOver) {
     status = "It's a draw!";
+  } else if (isMyTurn) {
+    status = "Your turn";
   } else {
     status = `Next player: ${nextPlayer}`;
   }
 
   async function handleCellClick(i: number) {
-    if (squares[i] || isOver || submitting) {
+    if (squares[i] || isOver || submitting || !isMyTurn) {
       return;
     }
     const playerId = nextPlayer === "X" ? game.playerXId : game.playerOId;

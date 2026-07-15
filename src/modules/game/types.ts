@@ -1,4 +1,4 @@
-export type GameStatus = "IN_PROGRESS" | "X_WON" | "O_WON" | "DRAW";
+export type GameStatus = "IN_PROGRESS" | "READY" | "X_WON" | "O_WON" | "DRAW";
 
 export type Cell = "X" | "O" | null;
 

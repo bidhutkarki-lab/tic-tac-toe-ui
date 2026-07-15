@@ -40,6 +40,13 @@ export async function joinGame(gameId: number, playerId: string): Promise<Game> 
   return asGame(res, "Join game");
 }
 
+export async function startGame(gameId: number): Promise<Game> {
+  const res = await apiFetch(`${API_BASE}/${gameId}/start`, {
+    method: "POST",
+  });
+  return asGame(res, "Start game");
+}
+
 export async function getGame(gameId: number): Promise<Game> {
   const res = await apiFetch(`${API_BASE}/${gameId}`);
   return asGame(res, "Load game");
