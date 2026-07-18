@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreatePlayerForm } from "../../players/components/CreatePlayerForm";
+import { Leaderboard } from "../../players/components/Leaderboard";
 import { toaster } from "../../../shared/toaster";
 import { createGame } from "../api";
-import { getMyPlayer } from "../../players/api";
-import type { Player } from "../../players/types";
+import { getLeaderboard, getMyPlayer } from "../../players/api";
+import type { LeaderboardEntry, Player } from "../../players/types";
 
 export function CreateGamePage() {
   const navigate = useNavigate();
@@ -12,6 +13,9 @@ export function CreateGamePage() {
   const [loading, setLoading] = useState(true);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[] | null>(
+    null,
+  );
 
   // Load the existing player (if any) so we can skip the create-player step.
   useEffect(() => {
@@ -26,6 +30,21 @@ export function CreateGamePage() {
         }
       } finally {
         if (active) setLoading(false);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const entries = await getLeaderboard();
+        if (active) setLeaderboard(entries);
+      } catch {
+        // Leaderboard is non-critical; leave it hidden if it fails to load.
       }
     })();
     return () => {
@@ -72,7 +91,7 @@ export function CreateGamePage() {
   }
 
   return (
-    <div className="game">
+    <div className="game play-layout">
       <form
         className="new-game"
         onSubmit={(e) => {
@@ -89,6 +108,13 @@ export function CreateGamePage() {
           {starting ? "Starting…" : "Start Game"}
         </button>
       </form>
+
+      {leaderboard && leaderboard.length > 0 && (
+        <aside className="play-leaderboard">
+          <h2 className="leaderboard-title">Leaderboard</h2>
+          <Leaderboard entries={leaderboard} currentPlayerId={player.id} />
+        </aside>
+      )}
     </div>
   );
 }

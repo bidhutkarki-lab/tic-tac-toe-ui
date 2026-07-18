@@ -7,3 +7,14 @@ export type Player = {
 export type RegisterPlayerRequest = {
   username: string;
 };
+
+export type LeaderboardEntry = {
+  rank: number;
+  playerId: string;
+  username: string;
+  rating: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  gamesPlayed: number;
+};
