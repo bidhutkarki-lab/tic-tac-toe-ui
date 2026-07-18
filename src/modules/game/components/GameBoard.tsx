@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Cell, Game } from "../types";
 import { applyGameState, submitMove } from "../api";
+import { useGameSocket } from "../socket";
 import { getMyPlayer, getPlayer } from "../../players/api";
 import type { Player } from "../../players/types";
 import { Board } from "./Board";
@@ -16,6 +17,10 @@ export function GameBoard({ game: initialGame, onNewGame }: GameBoardProps) {
   const [submitting, setSubmitting] = useState(false);
   const [names, setNames] = useState<Record<string, string>>({});
   const [me, setMe] = useState<Player | null>(null);
+
+  // Subscribe to the game's broadcast topic so every opponent move updates the
+  // board in real time. Each broadcast delivers the authoritative Game.
+  useGameSocket(initialGame.id, setGame);
 
   // Load the viewer's player so we can enforce turn order.
   useEffect(() => {
