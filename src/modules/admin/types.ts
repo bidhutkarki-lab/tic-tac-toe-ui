@@ -8,6 +8,15 @@ export type AdminUser = {
   authId: string;
 };
 
+export type GameResult = {
+  id: number;
+  gameId: number;
+  playerId: string;
+  outcome: string;
+  points: number;
+  createdAt: string;
+};
+
 export type Page<T> = {
   content: T[];
   page: number;

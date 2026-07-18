@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { UsersTab } from "../components/UsersTab";
 import { PlayersTab } from "../components/PlayersTab";
+import { ResultsTab } from "../components/ResultsTab";
 import "./AdminPage.css";
 
-type AdminTab = "users" | "players";
+type AdminTab = "users" | "players" | "results";
 
 export function AdminPage() {
   const [tab, setTab] = useState<AdminTab>("users");
@@ -27,9 +28,19 @@ export function AdminPage() {
         >
           Players
         </button>
+        <button
+          role="tab"
+          aria-selected={tab === "results"}
+          className={`admin-tab${tab === "results" ? " is-active" : ""}`}
+          onClick={() => setTab("results")}
+        >
+          Results
+        </button>
       </nav>
 
-      {tab === "users" ? <UsersTab /> : <PlayersTab />}
+      {tab === "users" && <UsersTab />}
+      {tab === "players" && <PlayersTab />}
+      {tab === "results" && <ResultsTab />}
     </div>
   );
 }

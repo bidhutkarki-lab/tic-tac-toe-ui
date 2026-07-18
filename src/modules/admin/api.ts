@@ -1,9 +1,10 @@
-import type { AdminUser, Page } from "./types";
+import type { AdminUser, GameResult, Page } from "./types";
 import type { Player } from "../players/types";
 import { apiFetch, extractErrorMessage } from "../../shared/http";
 
 const USERS_BASE = "/tic-tac-toe/admin/users";
 const PLAYERS_BASE = "/tic-tac-toe/players";
+const RESULTS_BASE = "/tic-tac-toe/results";
 
 export async function listUsers(
   page = 0,
@@ -26,6 +27,15 @@ export async function listPlayers(): Promise<Player[]> {
   if (!res.ok) {
     const message = extractErrorMessage(await res.text().catch(() => ""));
     throw new Error(message ?? "Load players failed. Please try again.");
+  }
+  return res.json();
+}
+
+export async function listResults(): Promise<GameResult[]> {
+  const res = await apiFetch(`${RESULTS_BASE}`);
+  if (!res.ok) {
+    const message = extractErrorMessage(await res.text().catch(() => ""));
+    throw new Error(message ?? "Load results failed. Please try again.");
   }
   return res.json();
 }
